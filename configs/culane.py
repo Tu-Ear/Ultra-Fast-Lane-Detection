@@ -1,6 +1,6 @@
 # DATA
 dataset='CULane'
-data_root = '/home/ldp/zjf/dataset/CULane'
+data_root = '/data/ldp/zjf/dataset/CULane'
 
 # TRAIN
 epoch = 50
@@ -28,15 +28,15 @@ shp_loss_w = 0.0
 # EXP
 note = ''
 
-log_path = '/home/ldp/zjf/log'
+log_path = '/data/ldp/zjf/log'
 
 # FINETUNE or RESUME MODEL PATH
 finetune = None
 resume = None
 
 # TEST
-test_model = None
-test_work_dir = None
+test_model = '/data/ldp/zjf/log/20221219_161349_lr_1e-01_b_32/ep049.pth'
+test_work_dir = '/data/ldp/zjf/evaluation' + '/20221219_161349_lr_1e-01_b_32/ep049.pth'
 
 num_lanes = 4
 
