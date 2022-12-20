@@ -71,21 +71,21 @@ We provide two trained Res-18 models on CULane and Tusimple.
 |  CULane  |     68.4     |       69.7       |         324         | [GoogleDrive](https://drive.google.com/file/d/1zXBRTw50WOzvUp6XKsi8Zrk3MUC3uFuq/view?usp=sharing)/[BaiduDrive(code:w9tw)](https://pan.baidu.com/s/19Ig0TrV8MfmFTyCvbSa4ag) |
 
 # Evaluation and Visualization
-## 配置文件参数
+**配置文件参数**
 `model_mark` 标记 **模型所属的训练和在该训练中所属的批次** ，代码根据 `model_mark` 将测试结果和可视化结果分类放好，方便实验结束后分析。
-`model_mark` '模型所属的训练/在该训练中所属的批次'【即相对 `log_path` 的路径】
+`model_mark` = '模型所属的训练/在该训练中所属的批次'【即相对 `log_path` 的路径】
 
 - `model_mark` is a mark represent the model you want to evaluate. 
 - `test_model` is the full path of your evaluated model, which should be set as 'log_path' + `model_mark`
 Configure as above, you can save evaluate results by category.
 
 For evaluation
+
 1、modify `model_mark`、`test_model` and `test_work_dir` in your `configs/culane.py` or `configs/tusimple.py` config according to your target.
-- `test_work_dir` is the path to save your evaluated work, which should be set as 'path to save your evaluate' + `model_mark`
+- `test_work_dir` is the path to save your evaluated work, which should be set as 'path to save your evaluation' + `model_mark`
 
 2、run
 ```Shell
-mkdir tmp
 python test.py configs/culane.py
 
 python test.py configs/tusimple.py
@@ -93,8 +93,9 @@ python test.py configs/tusimple.py
 代码会测试 `test_model` 并保存到 `test_work_dir`
 Same as training, multi-gpu evaluation is also supported.
 
+
 For visualization, firstly modify `model_mark`、`test_model` and `visualize_work_dir` in configuration file according to your target.
-- `visualize_work_dir` is the path to save your visualized work, which should be set as 'path to save your visualize' + `model_mark`
+- `visualize_work_dir` is the path to save your visualized work, which should be set as 'path to save your visualization' + `model_mark`
 
 We provide a script to visualize the detection results. Run the following commands to visualize on the testing set of CULane and Tusimple.
 ```Shell
@@ -103,6 +104,8 @@ python demo.py configs/culane.py
 python demo.py configs/tusimple.py
 ```
 Since the testing set of Tusimple is not ordered, the visualized video might look bad and we **do not recommend** doing this.
+
+
 运行可视化脚本，**代码会将 `test_model` 可视化并将结果保存到 `visualize_work_dir`**
 
 
