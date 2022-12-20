@@ -77,7 +77,9 @@ We provide two trained Res-18 models on CULane and Tusimple.
 
 - `model_mark` is a mark represent the model you want to evaluate. 
 - `test_model` is the full path of your evaluated model, which should be set as 'log_path' + `model_mark`
-Configure as above, you can save evaluate results by category.
+
+
+Configure as above, you can save evaluate or visualize results by category. You just need to **modify model_mark** when you evaluate or visualize the model, the code will automatically save the work in the place by category.
 
 For evaluation
 
@@ -93,7 +95,7 @@ python test.py configs/tusimple.py
 代码会测试 `test_model` 并保存到 `test_work_dir`
 Same as training, multi-gpu evaluation is also supported.
 
-
+---
 For visualization, firstly modify `model_mark`、`test_model` and `visualize_work_dir` in configuration file according to your target.
 - `visualize_work_dir` is the path to save your visualized work, which should be set as 'path to save your visualization' + `model_mark`
 
