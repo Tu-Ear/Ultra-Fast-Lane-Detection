@@ -19,6 +19,7 @@
 #include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <algorithm>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 using namespace std;
@@ -45,11 +46,13 @@ void read_lane_file(const string &file_name, vector<vector<Point2f> > &lanes);
 void visualize(string &full_im_name, vector<vector<Point2f> > &anno_lanes, vector<vector<Point2f> > &detect_lanes, vector<int> anno_match, int width_lane);
 void save_visualize(string &full_im_name, vector<vector<Point2f> > &anno_lanes, vector<vector<Point2f> > &detect_lanes, vector<int> anno_match, int width_lane);
 void makedir(string &save_path);
+bool comp(const tuple<string, double> & a,const tuple<string, double> & b);
+void save_bad(string &bad_img_dir, vector<tuple<string, double> > &score_lists, int num);
 
 int main(int argc, char **argv)
 {
 	// process params
-	string anno_dir = "/data/driving/eval_data/anno_label/";
+    string anno_dir = "/data/driving/eval_data/anno_label/";
 	string detect_dir = "/data/driving/eval_data/predict_label/";
 	string im_dir = "/data/driving/eval_data/img/";
 	string list_im_file = "/data/driving/eval_data/img/all.txt";
@@ -149,8 +152,10 @@ int main(int argc, char **argv)
   }
   ifs_im_list.close();
 
-  vector<tuple<vector<int>, long, long, long, long>> tuple_lists;
+  vector<tuple<vector<int>, long, long, long, long, double>> tuple_lists;
   tuple_lists.resize(filelists.size());
+  vector<tuple<string, double>> score_lists;
+  score_lists.resize(filelists.size());
 
 #pragma omp parallel for
 	for (int i = 0; i < filelists.size(); i++)
@@ -165,6 +170,7 @@ int main(int argc, char **argv)
 		read_lane_file(anno_file_name, anno_lanes);
 		read_lane_file(detect_file_name, detect_lanes);
 		tuple_lists[i] = counter.count_im_pair(anno_lanes, detect_lanes);
+		score_lists[i] = make_tuple(full_im_name, get<5>(tuple_lists[i]));
 		if (show)
 		{
 			auto anno_match = get<0>(tuple_lists[i]);
@@ -187,6 +193,7 @@ int main(int argc, char **argv)
 		fn += get<4>(result);
 //		cout << "tp: " << get<1>(result) << " fp: " << get<2>(result) << " tn: " << get<3>(result) << " fn: " << get<4>(result) << endl;
 	}
+
 	counter.setTP(tp);
 	counter.setFP(fp);
 	counter.setFN(fn);
@@ -207,6 +214,33 @@ int main(int argc, char **argv)
 	ofs_out_file<<"precision: "<<precision<<endl;
 	ofs_out_file<<"recall: "<<recall<<endl;
 	ofs_out_file<<"Fmeasure: "<<F<<endl<<endl;
+
+//--------------------------------------------------
+	string score_img = "xx.jpg";
+	double score_num = -1.0;
+	sort(score_lists.begin(),score_lists.end(),comp);
+	for (auto result : score_lists)
+	{
+		score_img = get<0>(result);
+		score_num = get<1>(result);
+//		cout << "score_img: " << score_img << " score_num: " << score_num << endl;
+		ofs_out_file<<score_img.substr(score_img.find("driver"));
+	    ofs_out_file<<": "<<score_num<<endl;
+	}
+
+    string bad_img_dir = output_file.substr(0, output_file.rfind("/txt")) + "/bad";
+    makedir(bad_img_dir);
+    int type_pos = output_file.find("/out");
+    int type_length = output_file.rfind(".txt") - type_pos;
+
+    string type = output_file.substr(type_pos, type_length);
+    bad_img_dir += type;
+    makedir(bad_img_dir);
+
+    save_bad(bad_img_dir, score_lists, 15);
+
+//--------------------------------------------------
+
 	ofs_out_file.close();
 	return 0;
 }
@@ -463,5 +497,31 @@ void makedir(string &save_path)
         {
             cout << save_path << " create failure!" << endl;
         }
+    }
+}
+
+bool comp(const tuple<string, double> & a,const tuple<string, double> & b)
+{
+	return get<1>(a) > get<1>(b);
+}
+
+void save_bad(string &bad_img_dir, vector<tuple<string, double> > &score_lists, int num)
+{
+    int len = score_lists.size();
+
+    for(int i = len - 1; i > len - 1 - num; i--)
+    {
+        string img = get<0>(score_lists.at(i));
+        string dest = bad_img_dir + "/" + to_string(i) + "_" + img.substr(img.find("MP4") + 4);
+
+        Mat src = imread(img);
+        imwrite(dest, src);
+/*
+        cout << "img: " << img << endl;
+        cout << "bad_img_dir: " << bad_img_dir << endl;
+        cout << "img.substr: " << img.substr(img.find("MP4") + 4) << endl;
+        cout << "dest: " << dest << endl;
+        cout << "------" << endl;
+*/
     }
 }

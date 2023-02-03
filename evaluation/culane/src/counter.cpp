@@ -58,18 +58,18 @@ void Counter::setFN(long value)
 	fn = value;
 }
 
-tuple<vector<int>, long, long, long, long> Counter::count_im_pair(const vector<vector<Point2f> > &anno_lanes, const vector<vector<Point2f> > &detect_lanes)
+tuple<vector<int>, long, long, long, long, double> Counter::count_im_pair(const vector<vector<Point2f> > &anno_lanes, const vector<vector<Point2f> > &detect_lanes)
 {
 	vector<int> anno_match(anno_lanes.size(), -1);
 	vector<int> detect_match;
 	if(anno_lanes.empty())
 	{
-		return make_tuple(anno_match, 0, detect_lanes.size(), 0, 0);
+		return make_tuple(anno_match, 0, detect_lanes.size(), 0, 0, 1.0);
 	}
 
 	if(detect_lanes.empty())
 	{
-		return make_tuple(anno_match, 0, 0, 0, anno_lanes.size());
+		return make_tuple(anno_match, 0, 0, 0, anno_lanes.size(), 0);
 	}
 	// hungarian match first
 	
@@ -91,6 +91,14 @@ tuple<vector<int>, long, long, long, long> Counter::count_im_pair(const vector<v
 
 	
 	int curr_tp = 0;
+	double score = 0;
+	for(int i=0; i<anno_lanes.size(); i++)
+    {
+        score += similarity[i][anno_match[i]];
+    }
+    score /= anno_lanes.size();
+    // cout << "score: " << score << endl;
+
 	// count and add
 	for(int i=0; i<anno_lanes.size(); i++)
 	{
@@ -105,7 +113,7 @@ tuple<vector<int>, long, long, long, long> Counter::count_im_pair(const vector<v
 	}
 	int curr_fn = anno_lanes.size() - curr_tp;
 	int curr_fp = detect_lanes.size() - curr_tp;
-	return make_tuple(anno_match, curr_tp, curr_fp, 0, curr_fn);
+	return make_tuple(anno_match, curr_tp, curr_fp, 0, curr_fn, score);
 }
 
 

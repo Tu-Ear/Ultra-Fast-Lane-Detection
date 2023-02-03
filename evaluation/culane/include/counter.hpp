@@ -32,7 +32,7 @@ class Counter
 		void setFN(long);
 		// direct add tp, fp, tn and fn
 		// first match with hungarian
-		tuple<vector<int>, long, long, long, long> count_im_pair(const vector<vector<Point2f> > &anno_lanes, const vector<vector<Point2f> > &detect_lanes);
+		tuple<vector<int>, long, long, long, long, double> count_im_pair(const vector<vector<Point2f> > &anno_lanes, const vector<vector<Point2f> > &detect_lanes);
 		void makeMatch(const vector<vector<double> > &similarity, vector<int> &match1, vector<int> &match2);
 
 	private:
