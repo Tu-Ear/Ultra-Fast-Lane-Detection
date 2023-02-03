@@ -17,6 +17,8 @@
 #include <sstream>
 #include <cstdlib>
 #include <string>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 using namespace std;
@@ -41,6 +43,8 @@ void help(void)
 
 void read_lane_file(const string &file_name, vector<vector<Point2f> > &lanes);
 void visualize(string &full_im_name, vector<vector<Point2f> > &anno_lanes, vector<vector<Point2f> > &detect_lanes, vector<int> anno_match, int width_lane);
+void save_visualize(string &full_im_name, vector<vector<Point2f> > &anno_lanes, vector<vector<Point2f> > &detect_lanes, vector<int> anno_match, int width_lane);
+void makedir(string &save_path);
 
 int main(int argc, char **argv)
 {
@@ -56,8 +60,9 @@ int main(int argc, char **argv)
 	int im_height = 1080;
 	int oc;
 	bool show = false;
+    bool save = false;
 	int frame = 1;
-	while((oc = getopt(argc, argv, "ha:d:i:l:w:t:c:r:sf:o:")) != -1)
+	while((oc = getopt(argc, argv, "ha:d:i:l:w:t:c:r:smf:o:")) != -1)
 	{
 		switch(oc)
 		{
@@ -90,6 +95,9 @@ int main(int argc, char **argv)
 				break;
 			case 's':
 				show = true;
+				break;
+            case 'm':
+				save = true;
 				break;
 			case 'f':
 				frame = atoi(optarg);
@@ -131,7 +139,7 @@ int main(int argc, char **argv)
 
 
 	Counter counter(im_width, im_height, iou_threshold, width_lane);
-	
+
 	vector<int> anno_match;
 	string sub_im_name;
   // pre-load filelist
@@ -156,7 +164,6 @@ int main(int argc, char **argv)
 		vector<vector<Point2f> > detect_lanes;
 		read_lane_file(anno_file_name, anno_lanes);
 		read_lane_file(detect_file_name, detect_lanes);
-		//cerr<<count<<": "<<full_im_name<<endl;
 		tuple_lists[i] = counter.count_im_pair(anno_lanes, detect_lanes);
 		if (show)
 		{
@@ -164,22 +171,29 @@ int main(int argc, char **argv)
 			visualize(full_im_name, anno_lanes, detect_lanes, anno_match, width_lane);
 			waitKey(0);
 		}
+		if (save)
+		{
+			auto anno_match = get<0>(tuple_lists[i]);
+			save_visualize(full_im_name, anno_lanes, detect_lanes, anno_match, width_lane);
+		}
 	}
 
 	long tp = 0, fp = 0, tn = 0, fn = 0;
-  for (auto result: tuple_lists) {
-    tp += get<1>(result);
-    fp += get<2>(result);
-    // tn = get<3>(result);
-    fn += get<4>(result);
-  }
+	for (auto result : tuple_lists)
+	{
+		tp += get<1>(result);
+		fp += get<2>(result);
+//		tn = get<3>(result);
+		fn += get<4>(result);
+//		cout << "tp: " << get<1>(result) << " fp: " << get<2>(result) << " tn: " << get<3>(result) << " fn: " << get<4>(result) << endl;
+	}
 	counter.setTP(tp);
 	counter.setFP(fp);
 	counter.setFN(fn);
-	
+
 	double precision = counter.get_precision();
 	double recall = counter.get_recall();
-	double F = 2 * precision * recall / (precision + recall);	
+	double F = 2 * precision * recall / (precision + recall);
 	cerr<<"finished process file"<<endl;
 	cout<<"precision: "<<precision<<endl;
 	cout<<"recall: "<<recall<<endl;
@@ -222,6 +236,7 @@ void read_lane_file(const string &file_name, vector<vector<Point2f> > &lanes)
 
 	ifs_lane.close();
 }
+
 
 void visualize(string &full_im_name, vector<vector<Point2f> > &anno_lanes, vector<vector<Point2f> > &detect_lanes, vector<int> anno_match, int width_lane)
 {
@@ -295,8 +310,158 @@ void visualize(string &full_im_name, vector<vector<Point2f> > &anno_lanes, vecto
 			line(img2, p_interp[n], p_interp[n+1], color, 2);
 		}
 	}
+
 	namedWindow("visualize", 1);
 	imshow("visualize", img);
 	namedWindow("visualize2", 1);
 	imshow("visualize2", img2);
+}
+
+void save_visualize(string &full_im_name, vector<vector<Point2f> > &anno_lanes, vector<vector<Point2f> > &detect_lanes, vector<int> anno_match, int width_lane)
+{
+//	cout<<"full_im_name: "<<full_im_name<<endl;
+	Mat img = imread(full_im_name, 1);
+	Mat img2 = imread(full_im_name, 1);
+	vector<Point2f> curr_lane;
+	vector<Point2f> p_interp;
+	Spline splineSolver;
+	Scalar color_B = Scalar(255, 0, 0);
+	Scalar color_G = Scalar(0, 255, 0);
+	Scalar color_R = Scalar(0, 0, 255);
+	Scalar color_P = Scalar(255, 0, 255);
+	Scalar color;
+	for (int i=0; i<anno_lanes.size(); i++)
+	{
+		curr_lane = anno_lanes[i];
+		if(curr_lane.size() == 2)
+		{
+			p_interp = curr_lane;
+		}
+		else
+		{
+			p_interp = splineSolver.splineInterpTimes(curr_lane, 50);
+		}
+		if (anno_match[i] >= 0)
+		{
+			color = color_G;
+		}
+		else
+		{
+			color = color_G;
+		}
+		for (int n=0; n<p_interp.size()-1; n++)
+		{
+			line(img, p_interp[n], p_interp[n+1], color, width_lane);
+			line(img2, p_interp[n], p_interp[n+1], color, 2);
+		}
+	}
+	bool detected;
+	for (int i=0; i<detect_lanes.size(); i++)
+	{
+		detected = false;
+		curr_lane = detect_lanes[i];
+		if(curr_lane.size() == 2)
+		{
+			p_interp = curr_lane;
+		}
+		else
+		{
+			p_interp = splineSolver.splineInterpTimes(curr_lane, 50);
+		}
+		for (int n=0; n<anno_lanes.size(); n++)
+		{
+			if (anno_match[n] == i)
+			{
+				detected = true;
+				break;
+			}
+		}
+		if (detected == true)
+		{
+			color = color_B;
+		}
+		else
+		{
+			color = color_R;
+		}
+		for (int n=0; n<p_interp.size()-1; n++)
+		{
+			line(img, p_interp[n], p_interp[n+1], color, width_lane);
+			line(img2, p_interp[n], p_interp[n+1], color, 2);
+		}
+	}
+
+//--------------------------------------------------------
+	string path = "/data/ldp/zjf/show";
+	string save_path = path + "/img";
+	string save_path2 = path + "/img2";
+
+    makedir(path);
+    makedir(save_path);
+    makedir(save_path2);
+//--------------------------------------------------------
+/*
+    [print to check the name and path]
+
+	cout<<"frame_name: "<<frame_name<<endl;
+	cout<<"mp4_name: "<<mp4_name<<endl;
+    cout<<"img_name: "<<img_name<<endl;
+
+	cout<<"org_path: "<<org_path<<endl;
+	cout<<"frame_path: "<<frame_path<<endl;
+	cout<<"mp4_path: "<<mp4_path<<endl;
+	cout<<"img_path: "<<img_path<<endl;
+
+	cout<<"-------------------"<<endl;
+    -------------------------------------------------------------------
+	org_path: /driver_193_90frame/06060833_0805.MP4/05130.jpg
+
+    frame_name: /driver_193_90frame
+    mp4_name: /06060833_0805.MP4
+    img_name: /05130.jpg
+    frame_path: /data/ldp/zjf/show2/img/driver_193_90frame
+    mp4_path: /data/ldp/zjf/show2/img/driver_193_90frame/06060833_0805.MP4
+    img_path: /data/ldp/zjf/show2/img/driver_193_90frame/06060833_0805.MP4/05130.jpg
+*/
+
+	string org_path = full_im_name.substr(full_im_name.find("/driver"));
+    int f = org_path.find("frame") + 5;
+    int m = org_path.find("MP4") + 3;
+
+	string frame_name = org_path.substr(0, f);
+    string mp4_name = org_path.substr(f, m - f);
+    string img_name = org_path.substr(m);
+
+    string frame_path = save_path + frame_name;
+    string mp4_path = frame_path + mp4_name;
+    makedir(frame_path);
+    makedir(mp4_path);
+
+    string frame_path2 = save_path2 + frame_name;
+    string mp4_path2 = frame_path2 + mp4_name;
+    makedir(frame_path2);
+    makedir(mp4_path2);
+
+    string img_path = mp4_path + img_name;
+    string img_path2 = mp4_path2 + img_name;
+
+    imwrite(img_path, img);
+    imwrite(img_path2, img2);
+
+}
+
+void makedir(string &save_path)
+{
+    if(access(save_path.c_str(),0) == -1)
+    {
+        int isSuccess = mkdir(save_path.c_str(),S_IRWXU);
+        if(isSuccess == 0)
+        {
+            cout << save_path << " create success!" << endl;
+        }
+        else
+        {
+            cout << save_path << " create failure!" << endl;
+        }
+    }
 }

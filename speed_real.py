@@ -135,15 +135,15 @@ def test_theoretical():
 
 if __name__ == "__main__":
     ###captrue data from camera or video
-    #cap = cv2.VideoCapture("video.mp4") #uncommen to activate a video input
-    cap = cv2.VideoCapture(0) #uncommen to activate a camera imput
+    # cap = cv2.VideoCapture("video.mp4") #uncommen to activate a video input
+    cap = cv2.VideoCapture(0) #uncommen to activate a camera input
     #resize(480, 640) #ucommen to change input size
     
     
     # torch.backends.cudnn.deterministic = False
     torch.backends.cudnn.benchmark = True
-    net = parsingNet(pretrained = False, backbone='18',cls_dim = (100+1,56,4),use_aux=False).cuda()
-    # net = parsingNet(pretrained = False, backbone='18',cls_dim = (200+1,18,4),use_aux=False).cuda()
+    # net = parsingNet(pretrained = False, backbone='18',cls_dim = (100+1,56,4),use_aux=False).cuda()
+    net = parsingNet(pretrained = False, backbone='18',cls_dim = (200+1,18,4),use_aux=False).cuda()
     net.eval()
     
 

@@ -36,10 +36,12 @@ resume = None
 
 # TEST and Visualization
 # model_mark = 模型所属的训练/在该训练中所属的批次【即相对log_path的路径】
-model_mark = '/20221219_161349_lr_1e-01_b_32/ep000.pth'
+model_mark = '/Official/culane_18.pth'
 test_model = '/data/ldp/zjf/log/CULane' + model_mark
-test_work_dir = '/data/ldp/zjf/evaluation/CULane' + model_mark
-visualize_work_dir = '/data/ldp/zjf/visualization/CULane' + model_mark
+test_work_dir = '/data/ldp/zjf/evaluation/Debug' + model_mark
+visualize_work_dir = '/data/ldp/zjf/visualization/Debug' + model_mark
+# test_work_dir = '/data/ldp/zjf/evaluation/CULane' + model_mark
+# visualize_work_dir = '/data/ldp/zjf/visualization/CULane' + model_mark
 
 num_lanes = 4
 
