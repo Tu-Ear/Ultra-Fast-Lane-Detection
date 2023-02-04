@@ -47,7 +47,7 @@ void visualize(string &full_im_name, vector<vector<Point2f> > &anno_lanes, vecto
 void save_visualize(string &full_im_name, vector<vector<Point2f> > &anno_lanes, vector<vector<Point2f> > &detect_lanes, vector<int> anno_match, int width_lane);
 void makedir(string &save_path);
 bool comp(const tuple<string, double> & a,const tuple<string, double> & b);
-void save_bad(string &bad_img_dir, vector<tuple<string, double> > &score_lists, int num);
+void save_bad(string &im_dir, string &anno_dir, string &detect_dir, string &bad_img_dir, vector<tuple<string, double> > &score_lists, int num);
 
 int main(int argc, char **argv)
 {
@@ -171,6 +171,10 @@ int main(int argc, char **argv)
 		string detect_file_name = detect_dir + sub_txt_name;
 		vector<vector<Point2f> > anno_lanes;
 		vector<vector<Point2f> > detect_lanes;
+//		cout << "anno_file_name" << anno_file_name << endl;
+//		cout << "detect_file_name" << detect_file_name << endl;
+//        cout << "sub_im_name" << sub_im_name << endl;
+
 		read_lane_file(anno_file_name, anno_lanes);
 		read_lane_file(detect_file_name, detect_lanes);
 		tuple_lists[i] = counter.count_im_pair(anno_lanes, detect_lanes);
@@ -241,7 +245,7 @@ int main(int argc, char **argv)
     bad_img_dir += type;
     makedir(bad_img_dir);
 
-    save_bad(bad_img_dir, score_lists, 15);
+    save_bad(im_dir, anno_dir, detect_dir, bad_img_dir, score_lists, 15);
 
 //--------------------------------------------------
 
@@ -509,7 +513,7 @@ bool comp(const tuple<string, double> & a,const tuple<string, double> & b)
 	return get<1>(a) > get<1>(b);
 }
 
-void save_bad(string &bad_img_dir, vector<tuple<string, double> > &score_lists, int num)
+void save_bad(string &im_dir, string &anno_dir, string &detect_dir, string &bad_img_dir, vector<tuple<string, double> > &score_lists, int num)
 {
     int len = score_lists.size();
 
@@ -517,15 +521,33 @@ void save_bad(string &bad_img_dir, vector<tuple<string, double> > &score_lists, 
     {
         string img = get<0>(score_lists.at(i));
         string dest = bad_img_dir + "/" + to_string(i) + "_" + img.substr(img.find("MP4") + 4);
-
-        Mat src = imread(img);
-        imwrite(dest, src);
-/*
+    /*
         cout << "img: " << img << endl;
         cout << "bad_img_dir: " << bad_img_dir << endl;
         cout << "img.substr: " << img.substr(img.find("MP4") + 4) << endl;
         cout << "dest: " << dest << endl;
         cout << "------" << endl;
-*/
+    */
+
+        Mat src = imread(img);
+        imwrite(dest, src);
+
+        string sub_im_name = img.substr(img.find("driver"));
+        string full_im_name = im_dir + sub_im_name;
+	    string sub_txt_name =  sub_im_name.substr(0, sub_im_name.find_last_of(".")) + ".lines.txt";
+		string anno_file_name = anno_dir + sub_txt_name;
+		string detect_file_name = detect_dir + sub_txt_name;
+
+        vector<vector<Point2f> > anno_lanes;
+		vector<vector<Point2f> > detect_lanes;
+		read_lane_file(anno_file_name, anno_lanes);
+		read_lane_file(detect_file_name, detect_lanes);
+
+        tuple<vector<int>, long, long, long, long, double> tuple_list;
+        Counter counter(1640, 590, 0.5, 30);
+		tuple_list = counter.count_im_pair(anno_lanes, detect_lanes);
+
+        auto anno_match = get<0>(tuple_list);
+		save_visualize(full_im_name, anno_lanes, detect_lanes, anno_match, 30);
     }
 }
