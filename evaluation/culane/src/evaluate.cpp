@@ -148,6 +148,10 @@ int main(int argc, char **argv)
   // pre-load filelist
   vector<string> filelists;
   while (getline(ifs_im_list, sub_im_name)) {
+    if(sub_im_name.back() == ' ')
+    {
+        sub_im_name = sub_im_name.substr(0, sub_im_name.length() - 1);
+    }
     filelists.push_back(sub_im_name);
   }
   ifs_im_list.close();
