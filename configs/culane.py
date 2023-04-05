@@ -1,18 +1,18 @@
 # DATA
-dataset='CULane'
+dataset = 'CULane'
 data_root = '/data/ldp/zjf/dataset/CULane'
 
 # TRAIN
 epoch = 50
 batch_size = 32
-optimizer = 'SGD'  #['SGD','Adam']
+optimizer = 'SGD'  # ['SGD','Adam']
 learning_rate = 0.1
 weight_decay = 1e-4
 momentum = 0.9
 
-scheduler = 'multi' #['multi', 'cos']
-steps = [25,38]
-gamma  = 0.1
+scheduler = 'multi'  # ['multi', 'cos']
+steps = [25, 38]
+gamma = 0.1
 warmup = 'linear'
 warmup_iters = 695
 
@@ -44,7 +44,3 @@ visualize_work_dir = '/data/ldp/zjf/visualization/ep049' + model_mark
 # visualize_work_dir = '/data/ldp/zjf/visualization/CULane' + model_mark
 
 num_lanes = 4
-
-
-
-

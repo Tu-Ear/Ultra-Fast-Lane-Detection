@@ -9,7 +9,6 @@ from importlib import import_module
 
 from addict import Dict
 
-
 BASE_KEY = '_base_'
 DELETE_KEY = '_delete_'
 
