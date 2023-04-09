@@ -31,16 +31,16 @@ note = ''
 log_path = '/data/ldp/zjf/log/CULane'
 
 # FINETUNE or RESUME MODEL PATH
-finetune = None
+finetune = '/data/ldp/zjf/log/Tusimple/20230405_092827_lr_4e-04_b_32/ep099.pth'
 resume = None
 
 # TEST and Visualization
 # model_mark = 模型所属的训练/在该训练中所属的批次【即相对log_path的路径】
 model_mark = '/20221219_161349_lr_1e-01_b_32/ep049.pth'
 test_model = '/data/ldp/zjf/log/CULane' + model_mark
-test_work_dir = '/data/ldp/zjf/evaluation/ep049' + model_mark
+# test_work_dir = '/data/ldp/zjf/evaluation/ep049' + model_mark
 visualize_work_dir = '/data/ldp/zjf/visualization/ep049' + model_mark
-# test_work_dir = '/data/ldp/zjf/evaluation/CULane' + model_mark
+test_work_dir = '/data/ldp/zjf/evaluation2/CULane' + model_mark
 # visualize_work_dir = '/data/ldp/zjf/visualization/CULane' + model_mark
 
 num_lanes = 4

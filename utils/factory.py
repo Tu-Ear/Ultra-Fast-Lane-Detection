@@ -130,6 +130,5 @@ class CosineAnnealingLR:
             return
 
         # cos policy
-
         for group, lr in zip(self.optimizer.param_groups, self.base_lr):
             group['lr'] = self.eta_min + (lr - self.eta_min) * (1 + math.cos(math.pi * self.iters / self.T_max)) / 2

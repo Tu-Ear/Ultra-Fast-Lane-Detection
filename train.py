@@ -10,7 +10,6 @@ from utils.metrics import MultiLabelAcc, AccTopk, Metric_mIoU, update_metrics, r
 
 from utils.common import merge_config, save_model, cp_projects
 from utils.common import get_work_dir, get_logger
-
 import time
 
 
@@ -89,6 +88,7 @@ def train(net, data_loader, loss_dict, optimizer, scheduler, logger, epoch, metr
 
 
 if __name__ == "__main__":
+    # os.environ["CUDA_VISIBLE_DEVICES"] = "2"
     torch.backends.cudnn.benchmark = True
 
     args, cfg = merge_config()
@@ -139,7 +139,7 @@ if __name__ == "__main__":
     metric_dict = get_metric_dict(cfg)
     loss_dict = get_loss_dict(cfg)
     logger = get_logger(work_dir, cfg)
-    cp_projects(args.auto_backup, work_dir)
+    # cp_projects(args.auto_backup, work_dir)
 
     for epoch in range(resume_epoch, cfg.epoch):
         train(net, train_loader, loss_dict, optimizer, scheduler, logger, epoch, metric_dict, cfg.use_aux)
