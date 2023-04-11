@@ -10,9 +10,9 @@ learning_rate = 0.1
 weight_decay = 1e-4
 momentum = 0.9
 
-scheduler = 'multi'  # ['multi', 'cos']
-steps = [25, 38]
-gamma = 0.1
+scheduler = 'multi' #['multi', 'cos']
+steps = [25,38]
+gamma  = 0.1
 warmup = 'linear'
 warmup_iters = 695
 
@@ -31,7 +31,7 @@ note = ''
 log_path = '/data/ldp/zjf/log/CULane'
 
 # FINETUNE or RESUME MODEL PATH
-finetune = '/data/ldp/zjf/log/Tusimple/20230405_092827_lr_4e-04_b_32/ep099.pth'
+finetune = None
 resume = None
 
 # TEST and Visualization

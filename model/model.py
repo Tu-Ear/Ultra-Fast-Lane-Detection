@@ -121,4 +121,4 @@ def real_init_weights(m):
             for mini_m in m.children():
                 real_init_weights(mini_m)
         else:
-            print('unkonwn module', m)
+            print('unknown module', m)
