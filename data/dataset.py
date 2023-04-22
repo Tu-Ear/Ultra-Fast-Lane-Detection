@@ -8,8 +8,12 @@ from data.mytransforms import find_start_pos
 
 
 def loader_func(path):
-    return Image.open(path)
-
+    img = Image.open(path)
+    im = img.load()
+    for i in range(img.width):
+        for j in range(int(img.height / 3)):
+            im[i, j] = (0, 0, 0)
+    return img
 
 class LaneTestDataset(torch.utils.data.Dataset):
     def __init__(self, path, list_path, img_transform=None):
