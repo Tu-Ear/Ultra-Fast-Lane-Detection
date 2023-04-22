@@ -31,7 +31,8 @@ note = ''
 log_path = '/data/ldp/zjf/log/CULane'
 
 # FINETUNE or RESUME MODEL PATH
-finetune = None
+# finetune = None
+finetune = '/data/ldp/zjf/log/Tusimple/20230407_160210_lr_4e-04_b_32/ep399.pth'
 resume = None
 
 # TEST and Visualization
