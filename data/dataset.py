@@ -8,12 +8,17 @@ from data.mytransforms import find_start_pos
 
 
 def loader_func(path):
+    return Image.open(path)
+
+
+def loader_func2(path):
     img = Image.open(path)
     im = img.load()
     for i in range(img.width):
         for j in range(int(img.height / 3)):
-            im[i, j] = (0, 0, 0)
+            im[i, j] = (255, 255, 255)
     return img
+
 
 class LaneTestDataset(torch.utils.data.Dataset):
     def __init__(self, path, list_path, img_transform=None):
@@ -71,7 +76,7 @@ class LaneClsDataset(torch.utils.data.Dataset):
         label = loader_func(label_path)
 
         img_path = os.path.join(self.path, img_name)
-        img = loader_func(img_path)
+        img = loader_func2(img_path)
 
         if self.simu_transform is not None:
             img, label = self.simu_transform(img, label)

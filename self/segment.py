@@ -3,19 +3,19 @@ import numpy as np
 from PIL import Image
 
 if __name__ == "__main__":
-    img_path = "/data/ldp/zjf/code/Ultra-Fast-Lane-Detection/img/600.jpg"
+    img_path = "/data/ldp/zjf/dataset/Tusimple/clips/0601/1494453497604532231/20.jpg"
     res_path = "/data/ldp/zjf/code/Ultra-Fast-Lane-Detection/self/segment/res.jpg"
     crop_path = "/data/ldp/zjf/code/Ultra-Fast-Lane-Detection/self/segment/crop.jpg"
     mask_path = "/data/ldp/zjf/code/Ultra-Fast-Lane-Detection/self/segment/mask.jpg"
 
-    # img = cv2.imread(img_path)
     img = Image.open(img_path)
     im = img.load()
     for i in range(img.width):
         for j in range(int(img.height / 3)):
-            im[i, j] = (0, 0, 0)
+            im[i, j] = 128
     img.save(res_path)
-
+    img2 = cv2.imread(res_path)
+    print(1)
 
     # img[np.where(img != 0)] = 255
     # cv2.imwrite(res_path, img)
