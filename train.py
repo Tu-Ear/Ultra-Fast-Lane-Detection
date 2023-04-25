@@ -88,7 +88,7 @@ def train(net, data_loader, loss_dict, optimizer, scheduler, logger, epoch, metr
 
 
 if __name__ == "__main__":
-    # os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "2"
     torch.backends.cudnn.benchmark = True
 
     args, cfg = merge_config()

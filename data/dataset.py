@@ -1,5 +1,5 @@
 import torch
-from PIL import Image
+from PIL import Image, ImageFilter
 import os
 import pdb
 import numpy as np
@@ -13,11 +13,15 @@ def loader_func(path):
 
 def loader_func2(path):
     img = Image.open(path)
-    im = img.load()
-    for i in range(img.width):
-        for j in range(int(img.height / 3)):
-            im[i, j] = (255, 255, 255)
-    return img
+    enhance = img.convert('L').filter(ImageFilter.EDGE_ENHANCE)
+    img_rgb_edges = Image.merge('RGB', [enhance, enhance, enhance])
+    img_result = Image.blend(img, img_rgb_edges, alpha=1)
+
+    im = img_result.load()
+    for i in range(img_result.width):
+        for j in range(int(img_result.height / 3)):
+            im[i, j] = 1
+    return img_result
 
 
 class LaneTestDataset(torch.utils.data.Dataset):

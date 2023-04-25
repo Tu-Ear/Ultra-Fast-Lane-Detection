@@ -27,10 +27,20 @@ def imageEnhance(input_path, output_path):
             # cv2.imwrite(output_file, cv2.GaussianBlur(cv_img, (kernel_size, kernel_size), 0))
 
             img = Image.open(file)
+            enhance = img.convert('L').filter(ImageFilter.EDGE_ENHANCE)
+
+            # img_edges = Image.fromarray(enhance)
+            img_rgb_edges = Image.merge('RGB', [enhance, enhance, enhance])
+            img_result = Image.blend(img, img_rgb_edges, alpha=1)
+
             # 将图片缩放为96*96大小
             # img = img.resize((96, 96), Image.ANTIALIAS)
             # 边缘增强
-            enhance = img.filter(ImageFilter.EDGE_ENHANCE)
+
+            im = img_result.load()
+            for i in range(img_result.width):
+                for j in range(int(img_result.height / 3)):
+                    im[i, j] = (0, 0, 0)
             # # 找到边缘
             # edges = img.filter(ImageFilter.FIND_EDGES)
             # # 浮雕
@@ -40,11 +50,11 @@ def imageEnhance(input_path, output_path):
             # # 平滑
             # smooth = img.filter(ImageFilter.SMOOTH)
             # 锐化
-            sharp = img.filter(ImageFilter.SHARPEN)
+            # sharp = img.filter(ImageFilter.SHARPEN)
 
             # # 细节
             # img.filter(ImageFilter.DETAIL)
-            enhance.save(output_file)
+            img_result.save(output_file)
 
             # cv_img = cv2.imread(file)
 
