@@ -15,12 +15,12 @@ def loader_func2(path):
     img = Image.open(path)
     enhance = img.convert('L').filter(ImageFilter.EDGE_ENHANCE)
     img_rgb_edges = Image.merge('RGB', [enhance, enhance, enhance])
-    img_result = Image.blend(img, img_rgb_edges, alpha=1)
+    img_result = Image.blend(img, img_rgb_edges, alpha=0.5)
 
     im = img_result.load()
     for i in range(img_result.width):
         for j in range(int(img_result.height / 3)):
-            im[i, j] = 1
+            im[i, j] = (1, 1, 1)
     return img_result
 
 

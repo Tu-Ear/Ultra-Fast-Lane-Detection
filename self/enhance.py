@@ -26,12 +26,12 @@ def imageEnhance(input_path, output_path):
             # cv_img = cv2.imread(file)
             # cv2.imwrite(output_file, cv2.GaussianBlur(cv_img, (kernel_size, kernel_size), 0))
 
-            img = Image.open(file)
-            enhance = img.convert('L').filter(ImageFilter.EDGE_ENHANCE)
+            img = Image.open(file).convert('L')
+            enhance = gray.filter(ImageFilter.EDGE_ENHANCE)
 
             # img_edges = Image.fromarray(enhance)
             img_rgb_edges = Image.merge('RGB', [enhance, enhance, enhance])
-            img_result = Image.blend(img, img_rgb_edges, alpha=1)
+            img_result = Image.blend(Image.open(file), img_rgb_edges, alpha=1)
 
             # 将图片缩放为96*96大小
             # img = img.resize((96, 96), Image.ANTIALIAS)
@@ -40,7 +40,7 @@ def imageEnhance(input_path, output_path):
             im = img_result.load()
             for i in range(img_result.width):
                 for j in range(int(img_result.height / 3)):
-                    im[i, j] = (0, 0, 0)
+                    im[i, j] = (255, 255, 255)
             # # 找到边缘
             # edges = img.filter(ImageFilter.FIND_EDGES)
             # # 浮雕

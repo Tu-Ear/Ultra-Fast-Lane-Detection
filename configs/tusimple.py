@@ -20,10 +20,10 @@ warmup_iters = 100
 # NETWORK
 backbone = '18'
 griding_num = 100
-use_aux = True
+use_aux = False
 
 # LOSS
-sim_loss_w = 1.0
+sim_loss_w = 0.0
 shp_loss_w = 0.0
 
 # EXP
